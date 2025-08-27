@@ -1,10 +1,11 @@
 {
   "name": "paga1euro",
   "version": "1.0.0",
+  "description": "Sito minimal con pagamento 1 euro e contatore",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
-  }
+  },
+  "author": "",
+  "license": "MIT"
 }
-
-"license": "ISC"
