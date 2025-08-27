@@ -6,3 +6,5 @@
     "start": "node server.js"
   }
 }
+
+"license": "ISC"
