@@ -32,7 +32,7 @@
 
   <script>
     // Fetch the global count from the backend server and display it
-    fetch('http://localhost:3000/count')
+    fetch('/increment')
       .then(response => response.json())
       .then(data => {
         var count = data && typeof data.count === 'number' ? data.count : 0;

@@ -78,3 +78,70 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Count server running at http://localhost:${PORT}/`);
 });
+// server.js
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+
+const ROOT = __dirname;
+const countFile = path.join(ROOT, 'count.json');
+
+// Funzioni contatore
+function readCount() {
+  try { return JSON.parse(fs.readFileSync(countFile, 'utf8')).count || 0; }
+  catch { return 0; }
+}
+function writeCount(n) {
+  fs.writeFileSync(countFile, JSON.stringify({ count: n }, null, 2), 'utf8');
+}
+
+// Mime types
+function contentType(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  return {
+    '.html': 'text/html; charset=utf-8',
+    '.js': 'text/javascript; charset=utf-8',
+    '.css': 'text/css; charset=utf-8',
+    '.json': 'application/json; charset=utf-8'
+  }[ext] || 'text/plain; charset=utf-8';
+}
+
+// Helper
+function send(res, status, body, headers = {}) {
+  res.writeHead(status, { 'Access-Control-Allow-Origin': '*', ...headers });
+  res.end(body);
+}
+
+// Server
+const server = http.createServer((req, res) => {
+  const url = new URL(req.url, `http://${req.headers.host}`);
+  const { pathname } = url;
+
+  // API
+  if (req.method === 'GET' && pathname === '/count') {
+    return send(res, 200, JSON.stringify({ count: readCount() }), { 'Content-Type': 'application/json' });
+  }
+  if (req.method === 'POST' && pathname === '/increment') {
+    const n = readCount() + 1;
+    writeCount(n);
+    return send(res, 200, JSON.stringify({ count: n }), { 'Content-Type': 'application/json' });
+  }
+
+  // Static: / → index.html
+  let filePath;
+  if (pathname === '/' || pathname === '/index.html') {
+    filePath = path.join(ROOT, 'index.html');
+  } else if (pathname === '/count.html') {
+    filePath = path.join(ROOT, 'count.html');
+  } else {
+    return send(res, 404, 'Not found');
+  }
+
+  fs.readFile(filePath, (err, data) => {
+    if (err) return send(res, 500, 'Server error');
+    send(res, 200, data, { 'Content-Type': contentType(filePath) });
+  });
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => console.log(`Listening on ${PORT}`));
