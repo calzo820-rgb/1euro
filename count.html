@@ -5,42 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Utenti che hanno pagato</title>
   <style>
+    :root { color-scheme: light dark; }
     body {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background-color: #f9f9f9;
-      color: #333;
-      text-align: center;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      min-height: 100vh; margin: 0; font-family: system-ui, Arial, sans-serif; gap: 16px;
+      background: #f6f6f6;
     }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
+    .card {
+      background: white; padding: 28px 32px; border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.06); text-align: center;
     }
-    p {
-      font-size: 1.2rem;
-    }
+    .num { font-size: 56px; font-weight: 800; margin: 6px 0; }
+    a { color: inherit; text-decoration: underline; }
   </style>
 </head>
 <body>
-  <h1>Grazie per il pagamento!</h1>
-  <p id="counter">Caricamento...</p>
+  <div class="card">
+    <div>Hanno pagato finora:</div>
+    <div id="count" class="num">—</div>
+    <div><a href="/index.html">Torna alla pagina principale</a></div>
+  </div>
 
   <script>
-    // Fetch the global count from the backend server and display it
-    fetch('/increment')
-      .then(response => response.json())
-      .then(data => {
-        var count = data && typeof data.count === 'number' ? data.count : 0;
-        document.getElementById('counter').textContent = 'Numero di utenti che hanno pagato: ' + count;
-      })
-      .catch(() => {
-        document.getElementById('counter').textContent = 'Impossibile recuperare il numero di utenti che hanno pagato.';
-      });
+    async function loadCount() {
+      try {
+        const r = await fetch('/count', { cache: 'no-store' });
+        const data = await r.json();
+        document.getElementById('count').textContent = data.count ?? 0;
+      } catch (e) {
+        document.getElementById('count').textContent = 'Errore';
+        console.error(e);
+      }
+    }
+    loadCount();
   </script>
 </body>
 </html>

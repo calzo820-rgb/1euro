@@ -5,120 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Paga 1 Euro</title>
   <style>
+    :root { color-scheme: light dark; }
     body {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background-color: #f9f9f9;
-      color: #333;
-      text-align: center;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      min-height: 100vh; margin: 0; font-family: system-ui, Arial, sans-serif; gap: 24px;
+      background: #f6f6f6;
     }
-    h1 {
-      font-size: 1.8rem;
-      margin-bottom: 2rem;
-      max-width: 800px;
-    }
-    .payment-section {
-      max-width: 400px;
-      width: 100%;
-    }
-    /* Style for credit/debit card form */
-    .card-form {
-      margin-top: 2rem;
-      padding: 1.5rem;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      background-color: #fff;
-    }
-    .card-form input {
-      width: 100%;
-      padding: 0.5rem;
-      margin: 0.5rem 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    .card-form button {
-      width: 100%;
-      padding: 0.7rem;
-      margin-top: 1rem;
-      border: none;
-      border-radius: 4px;
-      background-color: #0070ba;
-      color: #fff;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-    .card-form button:hover {
-      background-color: #005c99;
-    }
+    h1 { text-align: center; max-width: 640px; line-height: 1.2; font-weight: 700; }
+    .box { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,.06); }
   </style>
 </head>
 <body>
-  <h1>Paga 1 euro per vedere quanta gente ha pagato 1 euro per vedere quanta gente ha pagato 1 euro</h1>
+  <h1>paga 1 euro per vedere quanta gente ha pagato 1 euro per vedere quanta gente ha pagato 1 euro</h1>
 
-  <div class="payment-section">
-    <!-- PayPal payment button -->
+  <div class="box">
     <div id="paypal-button-container"></div>
-
-    <!-- Credit/debit card payment form -->
-    <form class="card-form" action="#" method="POST">
-      <input type="text" name="name" placeholder="Nome sulla carta" required>
-      <input type="text" name="cardnumber" placeholder="Numero della carta" required pattern="[0-9]{13,19}">
-      <input type="text" name="expiry" placeholder="MM/AA" required pattern="(0[1-9]|1[0-2])\/([0-9]{2})">
-      <input type="text" name="cvc" placeholder="CVC" required pattern="[0-9]{3,4}">
-      <button type="submit">Paga con carta</button>
-    </form>
   </div>
 
-  <!-- PayPal SDK (replace YOUR_CLIENT_ID with your actual client ID) -->
+  <!-- PayPal SDK: inserisci il tuo client-id live -->
   <script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=EUR"></script>
   <script>
-    // Helper function to increment the global payment count via the backend server
-    function incrementGlobalCount() {
-      return fetch('http://localhost:3000/increment', {
-        method: 'POST'
-      }).then(response => response.json()).catch(() => null);
-    }
-
-    // Render the PayPal button into #paypal-button-container
+    // Pulsante PayPal: crea ordine da 1€ e, al successo, incrementa e reindirizza
     paypal.Buttons({
-      // Set up the transaction
-      createOrder: function(data, actions) {
-        return actions.order.create({
-          purchase_units: [{
-            amount: {
-              value: '1.00' // Cost is 1 euro
-            }
-          }]
-        });
+      createOrder: (data, actions) => actions.order.create({
+        purchase_units: [{ amount: { value: '1.00', currency_code: 'EUR' } }]
+      }),
+      onApprove: async (data, actions) => {
+        try {
+          await actions.order.capture();
+          await fetch('/increment', { method: 'POST' });
+          window.location.href = '/count.html';
+        } catch (e) {
+          alert('Si è verificato un problema con il pagamento.');
+          console.error(e);
+        }
       },
-      // Finalize the transaction
-      onApprove: function(data, actions) {
-        return actions.order.capture().then(function(details) {
-          // After payment, increment the global count on the server
-          incrementGlobalCount().then(() => {
-            // Alert the payer's name for confirmation
-            alert('Pagamento completato da ' + details.payer.name.given_name + '!');
-            // Redirect to the page that shows how many have paid
-            window.location.href = 'count.html';
-          });
-        });
+      onError: (err) => {
+        console.error('PayPal error', err);
+        alert('Errore PayPal. Riprova più tardi.');
       }
     }).render('#paypal-button-container');
-
-    // Handle credit/debit card form submission by incrementing global count and redirecting to count.html
-    document.querySelector('.card-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      // Here you would normally process the card payment through a payment gateway
-      // For this demo we simply increment the count on the server
-      incrementGlobalCount().then(() => {
-        window.location.href = 'count.html';
-      });
-    });
   </script>
 </body>
 </html>

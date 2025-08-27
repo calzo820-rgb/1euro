@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node server.js"
   },
-  "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
 }
