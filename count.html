@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Utenti che hanno pagato</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    p {
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Grazie per il pagamento!</h1>
+  <p id="counter">Caricamento...</p>
+
+  <script>
+    // Fetch the global count from the backend server and display it
+    fetch('http://localhost:3000/count')
+      .then(response => response.json())
+      .then(data => {
+        var count = data && typeof data.count === 'number' ? data.count : 0;
+        document.getElementById('counter').textContent = 'Numero di utenti che hanno pagato: ' + count;
+      })
+      .catch(() => {
+        document.getElementById('counter').textContent = 'Impossibile recuperare il numero di utenti che hanno pagato.';
+      });
+  </script>
+</body>
+</html>
