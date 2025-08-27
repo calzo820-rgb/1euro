@@ -23,7 +23,8 @@
   </div>
 
   <!-- PayPal SDK: inserisci il tuo client-id live -->
-  <script src="https://www.paypal.com/sdk/js?client-id=AXyC_BCcjI9lgq7F0WquLjZDb8E7hGAjzHlCcvkB21_3MjVCwJPLB_aKnbwRQ13bSeeufZSqROeqfP7g&currency=EUR&intent=CAPTURE&disable-funding=card,credit"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=AXyC_BCcjI9lgq7F0WquLjZDb8E7hGAjzHlCcvkB21_3MjVCwJPLB_aKnbwRQ13bSeeufZSqROeqfP7g&currency=EUR&components=buttons&disable-funding=card,mybank,sofort,giropay,bancontact,ideal"></script>
+
   <script>
     // Pulsante PayPal: crea ordine da 1€ e, al successo, incrementa e reindirizza
     paypal.Buttons({
